@@ -97,5 +97,3 @@ class pieChart(TemplateMixin, NVD3Chart):
             self.set_graph_height(height)
         if width:
             self.set_graph_width(width)
-        self.donut = kwargs.get('donut', False)
-        self.donutRatio = kwargs.get('donutRatio', 0.35)

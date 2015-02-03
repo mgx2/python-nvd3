@@ -44,3 +44,4 @@ htmlcov
 test_*.html
 #[vim]
 *.swp
+.idea

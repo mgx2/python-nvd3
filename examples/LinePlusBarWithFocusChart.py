@@ -9,7 +9,7 @@ for d3.js without taking away the power that d3.js gives you.
 Project location : https://github.com/areski/python-nvd3
 """
 
-from nvd3.linePlusBarWithFocusChart import linePlusBarWithFocusChart
+from nvd3 import linePlusBarWithFocusChart
 import random
 import datetime
 import time

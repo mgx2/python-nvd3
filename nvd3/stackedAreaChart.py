@@ -90,8 +90,8 @@ class stackedAreaChart(TemplateMixin, NVD3Chart):
                                date=True)
             self.set_custom_tooltip_flag(True)
         else:
-            self.create_x_axis('xAxis', format=kwargs.get('x_axis_format',
-                                                          '.2f'))
+            self.create_x_axis('xAxis', format=None)
+
         self.create_y_axis('yAxis', format=kwargs.get('y_axis_format', '.2f'))
 
         self.set_graph_height(height)

@@ -3,8 +3,58 @@
 
 {% extends "content.html" %}
 {% block body %}
-    
-{# calling super guarantees everying in content is also found here ...#}
-{{super()}}
+
+    {% block data %}
+    {{super()}}
+    {% endblock data %}
+
+    {% block init %}
+    {{super()}}
+    {% endblock init %}
+
+    {% block axes %}
+    {{super()}}
+    {% endblock axes %}
+
+    {% if chart.x_axis_format == 'AM_PM' %}
+        function get_am_pm(d){
+            if (d > 12) {
+                d = d - 12; return (String(d) + 'PM');
+            }
+            else {
+                return (String(d) + 'AM');
+            }
+        };
+    {% endif %}
+
+    {# interpolation options #}
+    {%  if chart.interp_type == 'cardinal' %}
+            var interpolation = d3.svg.line()
+            .interpolate('cardinal')
+            .tension({{ chart.interp_tension }});
+
+        chart.lines.interpolate(function(points) {
+                return interpolation(points).substring(1);
+        });
+    {% else %}
+        chart.interpolate({{ chart.interp_type }})
+    {% endif %}
+
+    {% block legend %}
+    {{super()}}
+    {% endblock legend %}
+
+    {% block custoattr %}
+    {{super()}}
+    {% endblock custoattr %}
+
+    {% block inject %}
+    {{ super() }}
+    {% endblock inject %}
+
+    {% block close %}
+    {{ super() }}
+    {% endblock close %}
+
 
 {% endblock body %}

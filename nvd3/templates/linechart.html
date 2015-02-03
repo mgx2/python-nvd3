@@ -27,6 +27,23 @@
         };
     {% endif %}
 
+    {# interpolation options #}
+    {%  if chart.interp_type == 'cardinal' %}
+            var interpolation = d3.svg.line()
+            .interpolate('cardinal')
+            .tension({{ chart.interp_tension }});
+
+        chart.lines.interpolate(function(points) {
+                return interpolation(points).substring(1);
+        });
+    {% else %}
+        chart.interpolate({{ chart.interp_type }})
+    {% endif %}
+
+    {% block tooltip %}
+    {{super()}}
+    {% endblock tooltip %}
+
     {% block legend %}
     {{super()}}
     {% endblock legend %}

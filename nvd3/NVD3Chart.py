@@ -20,7 +20,7 @@ CONTENT_FILENAME = "./content.html"
 PAGE_FILENAME = "./page.html"
 
 
-pl = PackageLoader('nvd3', 'templates')
+pl = PackageLoader('common.libs.nvd3', 'templates')
 jinja2_env = Environment(lstrip_blocks=True, trim_blocks=True, loader=pl)
 
 template_content = jinja2_env.get_template(CONTENT_FILENAME)
@@ -41,7 +41,7 @@ class NVD3Chart(object):
     #: chart count
     count = 0
     #:  directory holding the assets (bower_components)
-    assets_directory = './bower_components/'
+    assets_directory = './assets/'
 
     # this attribute is overriden by children of this
     # class
@@ -102,6 +102,10 @@ class NVD3Chart(object):
         self.series = []
         self.axislist = {}
         # accepted keywords
+
+        self.interp_type = kwargs.get('interp_type', 'linear')
+        self.interp_tension = kwargs.get('interp_tension', 0.50)        # value between 0.00-1.00
+
         self.display_container = kwargs.get('display_container', True)
         self.charttooltip_dateformat = kwargs.get('charttooltip_dateformat',
                                                   '%d %b %Y')
@@ -115,10 +119,11 @@ class NVD3Chart(object):
         self.margin_top = kwargs.get('margin_top', 30)
         self.height = kwargs.get('height', '')
         self.width = kwargs.get('width', '')
+        self.padding = kwargs.get('padding', 100)
         self.stacked = kwargs.get('stacked', False)
         self.resize = kwargs.get('resize', False)
         self.show_legend = kwargs.get('show_legend', True)
-        self.show_labels = kwargs.get('show_labels', True)
+        self.show_labels = kwargs.get('show_labels', True)      # only supported in pie chart...
         self.tag_script_js = kwargs.get('tag_script_js', True)
         self.use_interactive_guideline = kwargs.get("use_interactive_guideline",
                                                     False)
@@ -147,15 +152,15 @@ class NVD3Chart(object):
         self.header_css = [
             '<link href="%s" rel="stylesheet" />' % h for h in
             (
-                self.assets_directory + 'nvd3/src/nv.d3.css',
+                self.assets_directory + 'nv.d3.css',
             )
         ]
 
         self.header_js = [
             '<script src="%s"></script>' % h for h in
             (
-                self.assets_directory + 'd3/d3.min.js',
-                self.assets_directory + 'nvd3/nv.d3.min.js'
+                self.assets_directory + 'd3.min.js',
+                self.assets_directory + 'nv.d3.min.js'
             )
         ]
 
@@ -220,6 +225,10 @@ class NVD3Chart(object):
                 serie = [{'x': x[i], 'y': y} for i, y in enumerate(y)]
 
         data_keyvalue = {'values': serie, 'key': name}
+
+        # Shading area for line charts              # added by Muneem 12/4/2014
+        if 'area' in kwargs and kwargs['area']:
+            data_keyvalue['area'] = kwargs['area']
 
         # multiChart
         # Histogram type='bar' for the series
@@ -406,7 +415,7 @@ class NVD3Chart(object):
         # Include data
         self.series_js = json.dumps(self.series)
 
-    def create_x_axis(self, name, label=None, format=None, date=False, custom_format=False):
+    def create_x_axis(self, name, label=None, format=None, date=False, custom_format=False, rotateLabels = 0):
         """Create X-axis"""
         axis = {}
         if custom_format and format:
@@ -421,18 +430,21 @@ class NVD3Chart(object):
             axis['axisLabel'] = "'" + label + "'"
 
         # date format : see https://github.com/mbostock/d3/wiki/Time-Formatting
-        if date:
-            self.dateformat = format
+        if date is True:
+            self.date_format = format
             axis['tickFormat'] = "function(d) { return d3.time.format('%s')(new Date(parseInt(d))) }\n" % \
-                self.dateformat
+                self.date_format
             # flag is the x Axis is a date
             if name[0] == 'x':
                 self.x_axis_date = True
 
+        # Rotate labels
+        axis['rotateLabels'] = rotateLabels     # added by Muneem 11/20/2014
+
         # Add new axis to list of axis
         self.axislist[name] = axis
 
-    def create_y_axis(self, name, label=None, format=None, custom_format=False):
+    def create_y_axis(self, name, label=None, format=None, custom_format=False, rotateLabels = 0):
         """
         Create Y-axis
         """
@@ -445,6 +457,9 @@ class NVD3Chart(object):
 
         if label:
             axis['axisLabel'] = "'" + label + "'"
+
+        # Rotate labels
+        axis['rotateLabels'] = rotateLabels
 
         # Add new axis to list of axis
         self.axislist[name] = axis
